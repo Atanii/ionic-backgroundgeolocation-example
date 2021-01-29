@@ -5,8 +5,10 @@ import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 
 import {
-  BackgroundGeolocation, BackgroundGeolocationConfig, BackgroundGeolocationEvents, BackgroundGeolocationResponse
+  BackgroundGeolocation, BackgroundGeolocationConfig, BackgroundGeolocationEvents, BackgroundGeolocationProvider, BackgroundGeolocationResponse
 } from '@ionic-native/background-geolocation/ngx';
+import { InAppLocationProviderService } from './services/in-app-location-provider.service';
+import { GeoLoc } from './models/GeoLoc';
 
 @Component({
   selector: 'app-root',
@@ -20,32 +22,7 @@ export class AppComponent implements OnInit {
       title: 'Geolocation',
       url: '/folder/Geolocation',
       icon: 'map'
-    },
-    // {
-    //   title: 'Outbox',
-    //   url: '/folder/Outbox',
-    //   icon: 'paper-plane'
-    // },
-    // {
-    //   title: 'Favorites',
-    //   url: '/folder/Favorites',
-    //   icon: 'heart'
-    // },
-    // {
-    //   title: 'Archived',
-    //   url: '/folder/Archived',
-    //   icon: 'archive'
-    // },
-    // {
-    //   title: 'Trash',
-    //   url: '/folder/Trash',
-    //   icon: 'trash'
-    // },
-    // {
-    //   title: 'Spam',
-    //   url: '/folder/Spam',
-    //   icon: 'warning'
-    // }
+    }
   ];
   public labels = [
     'Geolocation', 'POC'
@@ -55,7 +32,8 @@ export class AppComponent implements OnInit {
     private platform: Platform,
     private splashScreen: SplashScreen,
     private statusBar: StatusBar,
-    private backgroundGeolocation: BackgroundGeolocation
+    private backgroundGeolocation: BackgroundGeolocation,
+    private locService: InAppLocationProviderService
   ) {
     this.initializeApp();
   }
@@ -77,32 +55,51 @@ export class AppComponent implements OnInit {
 
   private initAndStartGeoloc(): any {
     const config: BackgroundGeolocationConfig = {
+      locationProvider: 0, // BackgroundGeolocationProvider.ANDROID_DISTANCE_FILTER_PROVIDER,
       desiredAccuracy: 10,
       stationaryRadius: 20,
       distanceFilter: 30,
-      debug: true, //  enable this hear sounds for background-geolocation life-cycle.
+      interval: 30000,
+      debug: false, //  enable this hear sounds for background-geolocation life-cycle.
       stopOnTerminate: false, // enable this to clear background location settings when the app terminates
     };
 
     this.backgroundGeolocation.configure(config)
       .then(() => {
+        // start recording location
+        this.backgroundGeolocation.start();
 
-        this.backgroundGeolocation.on(BackgroundGeolocationEvents.location).subscribe((location: BackgroundGeolocationResponse) => {
-          console.log(location);
+        this.backgroundGeolocation.on(BackgroundGeolocationEvents.location).subscribe(
+          (location: BackgroundGeolocationResponse) => {
+            console.log("Location updated, new location: ", location.time, ", ", location.longitude, ", ", location.latitude);
+            this.locService.addNewLoc({
+              time: location.time,
+              longitude: location.longitude,
+              latitude: location.latitude
+            } as GeoLoc)
+          }
+        )
+
+        this.backgroundGeolocation.on(BackgroundGeolocationEvents.stationary).subscribe(
+          (location: BackgroundGeolocationResponse) => {
+            console.log("Stationary Location updated, new location: ", location.time, ", ", location.longitude, ", ", location.latitude);
+            this.locService.addNewLoc({
+              time: location.time,
+              longitude: location.longitude,
+              latitude: location.latitude
+            } as GeoLoc)
+          }
+        )
+
+        this.backgroundGeolocation.on(BackgroundGeolocationEvents.error).subscribe(err => {
+          console.log("Error: ", err);
 
           // IMPORTANT:  You must execute the finish method here to inform the native plugin that you're finished,
           // and the background-task may be completed.  You must do this regardless if your operations are successful or not.
           // IF YOU DON'T, ios will CRASH YOUR APP for spending too much time in the background.
           this.backgroundGeolocation.finish(); // FOR IOS ONLY
-
-          // start recording location
-          this.backgroundGeolocation.start();
         });
-
       });
-
-    // start recording location
-    // this.backgroundGeolocation.start();
 
     // If you wish to turn OFF background-tracking, call the #stop method.
     // this.backgroundGeolocation.stop();

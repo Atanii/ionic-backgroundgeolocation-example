@@ -10,6 +10,7 @@ import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 
 import { BackgroundGeolocation } from '@ionic-native/background-geolocation/ngx';
+import { InAppLocationProviderService } from './services/in-app-location-provider.service';
 
 @NgModule({
   declarations: [AppComponent],
@@ -23,7 +24,8 @@ import { BackgroundGeolocation } from '@ionic-native/background-geolocation/ngx'
     StatusBar,
     SplashScreen,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-    BackgroundGeolocation
+    BackgroundGeolocation,
+    InAppLocationProviderService
   ],
   bootstrap: [AppComponent]
 })

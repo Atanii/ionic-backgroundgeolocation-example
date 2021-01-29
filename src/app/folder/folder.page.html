@@ -8,14 +8,10 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">{{ folder }}</ion-title>
-    </ion-toolbar>
-  </ion-header>
-
-  <div id="container">
-    <strong class="capitalize">{{ folder }}</strong>
-    <p>Explore <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
-  </div>
+  <ion-list>
+    <ion-list-header>Location updates, {{locations.length}} so far</ion-list-header>
+    <ion-item *ngFor="let item of locations">
+      <span>Time: {{item.time}}, Lat: {{item.latitude}}, Long: {{item.longitude}}</span>
+    </ion-item>
+  </ion-list>
 </ion-content>
