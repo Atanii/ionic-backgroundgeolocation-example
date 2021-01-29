@@ -7,8 +7,9 @@ import { StatusBar } from '@ionic-native/status-bar/ngx';
 import {
   BackgroundGeolocation, BackgroundGeolocationConfig, BackgroundGeolocationEvents, BackgroundGeolocationProvider, BackgroundGeolocationResponse
 } from '@ionic-native/background-geolocation/ngx';
-import { InAppLocationProviderService } from './services/in-app-location-provider.service';
+import { GeneralInappService } from './services/general-inapp.service';
 import { GeoLoc } from './models/GeoLoc';
+import { SimpleMessage } from './models/SimpleMessage';
 
 @Component({
   selector: 'app-root',
@@ -33,7 +34,7 @@ export class AppComponent implements OnInit {
     private splashScreen: SplashScreen,
     private statusBar: StatusBar,
     private backgroundGeolocation: BackgroundGeolocation,
-    private locService: InAppLocationProviderService
+    private locService: GeneralInappService
   ) {
     this.initializeApp();
   }
@@ -69,30 +70,49 @@ export class AppComponent implements OnInit {
         // start recording location
         this.backgroundGeolocation.start();
 
+        this.backgroundGeolocation.on(BackgroundGeolocationEvents.background).subscribe(
+          (res) => {
+            console.log("[INFO] Background mode");
+            this.locService.addNewMsg({
+              pluginTime: new Date(res.time),
+              appTime: new Date(),
+              content: "[INFO] Background mode"
+            } as SimpleMessage);
+          }
+        )
+
         this.backgroundGeolocation.on(BackgroundGeolocationEvents.location).subscribe(
           (location: BackgroundGeolocationResponse) => {
-            console.log("Location updated, new location: ", location.time, ", ", location.longitude, ", ", location.latitude);
+            console.log("Location updated, new location: ", new Date(location.time), ", ", new Date(), ", ", location.longitude, ", ", location.latitude);
             this.locService.addNewLoc({
-              time: location.time,
+              pluginTime: new Date(location.time),
+              appTime: new Date(),
               longitude: location.longitude,
               latitude: location.latitude
-            } as GeoLoc)
+            } as GeoLoc);
           }
         )
 
         this.backgroundGeolocation.on(BackgroundGeolocationEvents.stationary).subscribe(
           (location: BackgroundGeolocationResponse) => {
-            console.log("Stationary Location updated, new location: ", location.time, ", ", location.longitude, ", ", location.latitude);
+            console.log("Stationary Location updated, new location: ", new Date(location.time), ", ", new Date(), ", ", location.longitude, ", ", location.latitude);
             this.locService.addNewLoc({
-              time: location.time,
+              pluginTime: new Date(location.time),
+              appTime: new Date(),
               longitude: location.longitude,
               latitude: location.latitude
-            } as GeoLoc)
+            } as GeoLoc);
           }
         )
 
         this.backgroundGeolocation.on(BackgroundGeolocationEvents.error).subscribe(err => {
-          console.log("Error: ", err);
+          const c = "Error: " + err;
+          console.log(c);
+          this.locService.addNewMsg({
+            pluginTime: new Date(err.time),
+            appTime: new Date(),
+            content: c
+          } as SimpleMessage);
 
           // IMPORTANT:  You must execute the finish method here to inform the native plugin that you're finished,
           // and the background-task may be completed.  You must do this regardless if your operations are successful or not.
