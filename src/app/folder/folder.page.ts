@@ -18,29 +18,28 @@ export class FolderPage implements OnInit {
     private activatedRoute: ActivatedRoute,
     private generalService: GeneralInappService,
     private chRef: ChangeDetectorRef) {
-      this.locations = [];
-      this.messages = [];
-      this.generalService.locations.subscribe(loc => {
-        if (loc) {
-          console.log("New loc received: ", loc.latitude, ", ", loc.longitude, ", ", loc.appTime, ", ", loc.pluginTime);
-          this.locations.push(loc);
-          // to trigger changedetection
-          // this.locations = [].concat(this.locations);
-          this.chRef.detectChanges();
-        }
-      })
-
     this.locations = [];
-    this.generalService.messages.subscribe(msg => {
-      if (msg) {
-        this.messages.push(msg);
-        this.chRef.detectChanges();
-      }
-    })
+    this.messages = [];
   }
 
   ngOnInit() {
     this.folder = this.activatedRoute.snapshot.paramMap.get('id');
+    this.generalService.locations.subscribe(loc => {
+      if (loc) {
+        console.log("[INFO] New loc received: ", loc.latitude, ", ", loc.longitude, ", ", loc.appTime, ", ", loc.pluginTime);
+        this.locations.push(loc);
+        // to trigger changedetection
+        // this.locations = [].concat(this.locations);
+        this.chRef.detectChanges();
+      }
+    });
+    this.generalService.messages.subscribe(msg => {
+      if (msg) {
+        console.log("[INFO] New msg received: ", msg.content, ", ", msg.appTime, ", ", msg.pluginTime);
+        this.messages.push(msg);
+        this.chRef.detectChanges();
+      }
+    });
   }
 
 }
