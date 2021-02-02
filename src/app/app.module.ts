@@ -13,6 +13,7 @@ import { BackgroundGeolocation } from '@ionic-native/background-geolocation/ngx'
 import { GeneralInappService } from './services/general-inapp.service';
 
 import { BackgroundMode } from '@ionic-native/background-mode/ngx';
+import { HTTP } from '@ionic-native/http/ngx';
 
 @NgModule({
   declarations: [AppComponent],
@@ -28,7 +29,8 @@ import { BackgroundMode } from '@ionic-native/background-mode/ngx';
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     BackgroundGeolocation,
     GeneralInappService,
-    BackgroundMode
+    BackgroundMode,
+    HTTP
   ],
   bootstrap: [AppComponent]
 })

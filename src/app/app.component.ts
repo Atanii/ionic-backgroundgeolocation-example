@@ -76,6 +76,17 @@ export class AppComponent implements OnInit {
       stopOnStillActivity: false,
       debug: false, //  enable this hear sounds for background-geolocation life-cycle.
       stopOnTerminate: false, // enable this to clear background location settings when the app terminates
+
+      url: this.locService.URL,
+      httpHeaders: {
+         'Access-Control-Allow-Origin': '*'
+      },
+      // customize post properties
+       postTemplate: {
+        latitude: '@latitude',
+        longitude: '@longitude',
+        timeInMs: '@time'
+       }
     };
 
     this.backgroundGeolocation.configure(config)
@@ -91,17 +102,41 @@ export class AppComponent implements OnInit {
           }
         )
 
-        // this.backgroundGeolocation.on(BackgroundGeolocationEvents.location).subscribe(
-        //   (location: BackgroundGeolocationResponse) => {
-        //     console.log('Location updated, new location: ', new Date(location.time), ', ', new Date(), ', ', location.longitude, ', ', location.latitude);
-        //     this.locService.addNewLoc({
-        //       pluginTime: new Date(location.time),
-        //       appTime: new Date(),
-        //       longitude: location.longitude,
-        //       latitude: location.latitude
-        //     } as GeoLoc);
-        //   }
-        // )
+        this.backgroundGeolocation.on(BackgroundGeolocationEvents.location).subscribe(
+          (location: BackgroundGeolocationResponse) => {
+            // console.log('[INFO][HTTP_POST] Location updated, new location: ', new Date(location.time), ', ', new Date(), ', ', location.longitude, ', ', location.latitude);
+            // this.locService.addNewLoc({
+            //   pluginTime: new Date(location.time),
+            //   appTime: new Date(),
+            //   longitude: location.longitude,
+            //   latitude: location.latitude
+            // } as GeoLoc);
+
+            ///////////////////////////////////////// POST
+            this.locService.postNewLocation({
+              pluginTime: new Date(location.time),
+              appTime: new Date(),
+              longitude: location.longitude,
+              latitude: location.latitude,
+              msg: 'BackgroundGeolocationEvents.location'
+            } as GeoLoc);
+          }
+        )
+
+        this.backgroundGeolocation.headlessTask(function (event) {
+          if (event.name === 'location' ||
+              event.name === 'stationary') {
+            // var xhr = new XMLHttpRequest();
+            // xhr.open('POST', config.url);
+            // xhr.setRequestHeader('Content-Type', 'application/json');
+            // xhr.send(JSON.stringify(event.params));
+
+            ///////////////////////////////////////// POST
+            this.locService.postData(event.params);
+          }
+
+          return 'Processing event: ' + event.name; // will be logged
+        });
 
         // this.backgroundGeolocation.on(BackgroundGeolocationEvents.stationary).subscribe(
         //   (location: BackgroundGeolocationResponse) => {
@@ -114,6 +149,92 @@ export class AppComponent implements OnInit {
         //     } as GeoLoc);
         //   }
         // )
+
+        timer(1000, 10000).subscribe(_ => {
+          // CHECK STATUS
+          // this.backgroundGeolocation.checkStatus().then(res => {
+          //   const stats = `[INFO] Running: ${res.isRunning}, Auth: ${res.authorization}, Locservice: ${res.locationServicesEnabled}`;
+          //   console.log(stats);
+          //   this.locService.addNewMsg({
+          //     pluginTime: new Date(),
+          //     appTime: new Date(),
+          //     content: stats
+          //   } as SimpleMessage);
+          // });
+
+          // GET CURRENT LOC
+          this.backgroundGeolocation.getCurrentLocation().then(res => {
+            if (res && res.longitude !== undefined) {
+              const stats = `[INFO][TIMER] getCurrentLocation(),\n time: ${new Date(res.time)}, appTime: ${new Date()},\n long: ${res.longitude}, lat: ${res.latitude}`
+              console.log(stats);
+              this.locService.addNewLoc({
+                pluginTime: new Date(res.time),
+                appTime: new Date(),
+                longitude: res.longitude,
+                latitude: res.latitude
+              } as GeoLoc);
+              this.locService.addNewMsg({
+                pluginTime: new Date(res.time),
+                appTime: new Date(),
+                content: stats
+              } as SimpleMessage);
+              // var xhr = new XMLHttpRequest();
+              // xhr.open('POST', config.url);
+              // xhr.setRequestHeader('Content-Type', 'application/json');
+              // xhr.send(JSON.stringify({
+              //   time: new Date(res.time),
+              //   lon: res.longitude,
+              //   lat: res.latitude
+              // }));
+
+              ///////////////////////////////////////// POST
+              /*this.locService.postNewLocation({
+                pluginTime: new Date(res.time),
+                appTime: new Date(),
+                longitude: res.longitude,
+                latitude: res.latitude,
+                msg: 'BackgroundGeolocationEvents.location'
+              } as GeoLoc);*/
+            }
+          })
+
+          // GET STATIONARY
+          this.backgroundGeolocation.getStationaryLocation().then(res => {
+            if (res && res.longitude !== undefined) {
+              const stats = `[INFO][TIMER] getStationaryLocation(),\n time: ${new Date(res.time)}, appTime: ${new Date()},\n long: ${res.longitude}, lat: ${res.latitude}`
+              console.log(stats);
+              this.locService.addNewLoc({
+                pluginTime: new Date(res.time),
+                appTime: new Date(),
+                longitude: res.longitude,
+                latitude: res.latitude
+              } as GeoLoc);
+              this.locService.addNewMsg({
+                pluginTime: new Date(res.time),
+                appTime: new Date(),
+                content: stats
+              } as SimpleMessage);
+              // var xhr = new XMLHttpRequest();
+              // xhr.open('POST', config.url);
+              // xhr.setRequestHeader('Content-Type', 'application/json');
+              // xhr.send(JSON.stringify({
+              //   time: new Date(res.time),
+              //   lon: res.longitude,
+              //   lat: res.latitude
+              // }));
+
+              ///////////////////////////////////////// POST
+              /*this.locService.postNewLocation({
+                pluginTime: new Date(res.time),
+                appTime: new Date(),
+                longitude: res.longitude,
+                latitude: res.latitude,
+                msg: 'BackgroundGeolocationEvents.location'
+              } as GeoLoc);*/
+            }
+          })
+
+        });
 
         this.backgroundGeolocation.on(BackgroundGeolocationEvents.error).subscribe(err => {
           const c = `Error: ${err}`;
@@ -191,58 +312,6 @@ export class AppComponent implements OnInit {
             appTime: new Date(),
             content: 'Abort Requested'
           } as SimpleMessage);
-        });
-
-        timer(5000, 5000).subscribe(_ => {
-          // CHECK STATUS
-          // this.backgroundGeolocation.checkStatus().then(res => {
-          //   const stats = `[INFO] Running: ${res.isRunning}, Auth: ${res.authorization}, Locservice: ${res.locationServicesEnabled}`;
-          //   console.log(stats);
-          //   this.locService.addNewMsg({
-          //     pluginTime: new Date(),
-          //     appTime: new Date(),
-          //     content: stats
-          //   } as SimpleMessage);
-          // });
-
-          // GET CURRENT LOC
-          this.backgroundGeolocation.getCurrentLocation().then(res => {
-            if (res && res.longitude !== undefined) {
-              const stats = `[INFO][TIMER] getCurrentLocation(),\n time: ${new Date(res.time)}, appTime: ${new Date()},\n long: ${res.longitude}, lat: ${res.latitude}`
-              console.log(stats);
-              this.locService.addNewLoc({
-                pluginTime: new Date(res.time),
-                appTime: new Date(),
-                longitude: res.longitude,
-                latitude: res.latitude
-              } as GeoLoc);
-              this.locService.addNewMsg({
-                pluginTime: new Date(res.time),
-                appTime: new Date(),
-                content: stats
-              } as SimpleMessage);
-            }
-          })
-
-          // GET STATIONARY
-          this.backgroundGeolocation.getStationaryLocation().then(res => {
-            if (res && res.longitude !== undefined) {
-              const stats = `[INFO][TIMER] getStationaryLocation(),\n time: ${new Date(res.time)}, appTime: ${new Date()},\n long: ${res.longitude}, lat: ${res.latitude}`
-              console.log(stats);
-              this.locService.addNewLoc({
-                pluginTime: new Date(res.time),
-                appTime: new Date(),
-                longitude: res.longitude,
-                latitude: res.latitude
-              } as GeoLoc);
-              this.locService.addNewMsg({
-                pluginTime: new Date(res.time),
-                appTime: new Date(),
-                content: stats
-              } as SimpleMessage);
-            }
-          })
-
         });
 
     });
