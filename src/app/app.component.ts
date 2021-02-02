@@ -13,6 +13,8 @@ import { SimpleMessage } from './models/SimpleMessage';
 import { timer } from 'rxjs';
 import { TransitiveCompileNgModuleMetadata } from '@angular/compiler';
 
+import { BackgroundMode } from '@ionic-native/background-mode/ngx';
+
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
@@ -36,7 +38,8 @@ export class AppComponent implements OnInit {
     private splashScreen: SplashScreen,
     private statusBar: StatusBar,
     private backgroundGeolocation: BackgroundGeolocation,
-    private locService: GeneralInappService
+    private locService: GeneralInappService,
+    private backgroundMode: BackgroundMode
   ) {
     this.initializeApp();
   }
@@ -54,6 +57,7 @@ export class AppComponent implements OnInit {
       this.selectedIndex = this.appPages.findIndex(page => page.title.toLowerCase() === path.toLowerCase());
     }
     this.initAndStartGeoloc();
+    // this.backgroundMode.enable();
   }
 
   private initAndStartGeoloc(): any {

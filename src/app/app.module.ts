@@ -12,6 +12,8 @@ import { AppRoutingModule } from './app-routing.module';
 import { BackgroundGeolocation } from '@ionic-native/background-geolocation/ngx';
 import { GeneralInappService } from './services/general-inapp.service';
 
+import { BackgroundMode } from '@ionic-native/background-mode/ngx';
+
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
@@ -25,7 +27,8 @@ import { GeneralInappService } from './services/general-inapp.service';
     SplashScreen,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     BackgroundGeolocation,
-    GeneralInappService
+    GeneralInappService,
+    BackgroundMode
   ],
   bootstrap: [AppComponent]
 })
