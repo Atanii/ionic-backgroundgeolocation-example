@@ -155,8 +155,7 @@ export class AppComponent implements OnInit {
 
         this.backgroundGeolocation.on(BackgroundGeolocationEvents.location).subscribe(
           (location: BackgroundGeolocationResponse) => {
-            const msg = '[INFO][BackgroundGeolocationEvents.location] Location updated, new location: ', new Date(location.time), ', ', new Date(), ', ', location.longitude, ', ', location.latitude;
-            console.log(msg);
+            console.log('[INFO][BackgroundGeolocationEvents.location] Location updated, new location: ', new Date(location.time), ', ', new Date(), ', ', location.longitude, ', ', location.latitude);
             this.locService.addNewLoc({
               pluginTime: new Date(location.time),
               appTime: new Date(),
@@ -166,7 +165,7 @@ export class AppComponent implements OnInit {
             this.locService.addNewMsg({
               pluginTime: new Date(location.time),
               appTime: new Date(),
-              content: msg
+              content: '[INFO][BackgroundGeolocationEvents.location] Location updated'
             } as SimpleMessage);
 
             ///////////////////////////////////////// POST
