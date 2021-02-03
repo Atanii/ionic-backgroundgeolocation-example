@@ -14,6 +14,7 @@ import { timer } from 'rxjs';
 import { TransitiveCompileNgModuleMetadata } from '@angular/compiler';
 
 import { BackgroundMode } from '@ionic-native/background-mode/ngx';
+import { PowerManagement } from '@ionic-native/power-management/ngx';
 
 @Component({
   selector: 'app-root',
@@ -39,7 +40,8 @@ export class AppComponent implements OnInit {
     private statusBar: StatusBar,
     private backgroundGeolocation: BackgroundGeolocation,
     private locService: GeneralInappService,
-    private backgroundMode: BackgroundMode
+    private backgroundMode: BackgroundMode,
+    private powerManagement: PowerManagement
   ) {
     this.initializeApp();
   }
@@ -48,6 +50,54 @@ export class AppComponent implements OnInit {
     this.platform.ready().then(() => {
       this.statusBar.styleDefault();
       this.splashScreen.hide();
+
+      this.backgroundMode.enable();
+
+      /*this.powerManagement.release()
+        .then(res => {
+          console.log('[INFO][POWER] Wakelock release: ', res);
+        })
+        .catch(err => {
+          console.log('[INFO][POWER] Failed to release wakelock: ', err);
+        });*/
+
+      this.powerManagement.acquire()
+      .then(res => {
+        console.log('[INFO][POWER] Wakelock acquired: ', res);
+      })
+      .catch(err => {
+        console.log('[INFO][POWER] Failed to acquire wakelock: ', err);
+      });
+
+      this.powerManagement.setReleaseOnPause(false).then(
+        _ => {
+          console.log('setReleaseOnPause successfully');
+        },
+        err => {
+          console.log('Failed to set');
+        }
+      );
+
+
+      /*this.powerManagement.dim().then(
+        _ => {
+          console.log('Wakelock acquired');
+        },
+        err => {
+          console.log('Failed to acquire wakelock: ', err);
+        }
+      );
+  
+      this.powerManagement.setReleaseOnPause(true).then(
+        _ => {
+          console.log('setReleaseOnPause successfully');
+        },
+        err => {
+          console.log('Failed to set');
+        }
+      )*/
+
+      this.initAndStartGeoloc();
     });
   }
 
@@ -56,8 +106,6 @@ export class AppComponent implements OnInit {
     if (path !== undefined) {
       this.selectedIndex = this.appPages.findIndex(page => page.title.toLowerCase() === path.toLowerCase());
     }
-    this.initAndStartGeoloc();
-    // this.backgroundMode.enable();
   }
 
   private initAndStartGeoloc(): any {
@@ -72,10 +120,13 @@ export class AppComponent implements OnInit {
       stationaryRadius: 20,
       distanceFilter: 30,
       interval: 4900,
+      fastestInterval: 4900,
       startForeground: true,
       stopOnStillActivity: false,
       debug: false, //  enable this hear sounds for background-geolocation life-cycle.
       stopOnTerminate: false, // enable this to clear background location settings when the app terminates
+
+      syncThreshold: 1,
 
       url: this.locService.URL,
       httpHeaders: {
@@ -104,7 +155,7 @@ export class AppComponent implements OnInit {
 
         this.backgroundGeolocation.on(BackgroundGeolocationEvents.location).subscribe(
           (location: BackgroundGeolocationResponse) => {
-            // console.log('[INFO][HTTP_POST] Location updated, new location: ', new Date(location.time), ', ', new Date(), ', ', location.longitude, ', ', location.latitude);
+            console.log('[INFO][BackgroundGeolocationEvents.location] Location updated, new location: ', new Date(location.time), ', ', new Date(), ', ', location.longitude, ', ', location.latitude);
             // this.locService.addNewLoc({
             //   pluginTime: new Date(location.time),
             //   appTime: new Date(),
@@ -113,17 +164,19 @@ export class AppComponent implements OnInit {
             // } as GeoLoc);
 
             ///////////////////////////////////////// POST
-            this.locService.postNewLocation({
+            //this.backgroundGeolocation.finish();
+            /*this.locService.postNewLocation({
               pluginTime: new Date(location.time),
               appTime: new Date(),
               longitude: location.longitude,
               latitude: location.latitude,
               msg: 'BackgroundGeolocationEvents.location'
             } as GeoLoc);
+            this.backgroundGeolocation.finish();*/
           }
         )
 
-        this.backgroundGeolocation.headlessTask(function (event) {
+        /*this.backgroundGeolocation.headlessTask(function (event) {
           if (event.name === 'location' ||
               event.name === 'stationary') {
             // var xhr = new XMLHttpRequest();
@@ -131,12 +184,21 @@ export class AppComponent implements OnInit {
             // xhr.setRequestHeader('Content-Type', 'application/json');
             // xhr.send(JSON.stringify(event.params));
 
+            console.log("[INFO] TASK: ", event);
+
             ///////////////////////////////////////// POST
             this.locService.postData(event.params);
+
+            this.locService.addNewMsg({
+               pluginTime: new Date(),
+               appTime: new Date(),
+              content: JSON.stringify(event.params)
+             } as SimpleMessage);
+            
           }
 
           return 'Processing event: ' + event.name; // will be logged
-        });
+        });*/
 
         // this.backgroundGeolocation.on(BackgroundGeolocationEvents.stationary).subscribe(
         //   (location: BackgroundGeolocationResponse) => {
@@ -150,7 +212,7 @@ export class AppComponent implements OnInit {
         //   }
         // )
 
-        timer(1000, 10000).subscribe(_ => {
+        timer(1000, 15000).subscribe(_ => {
           // CHECK STATUS
           // this.backgroundGeolocation.checkStatus().then(res => {
           //   const stats = `[INFO] Running: ${res.isRunning}, Auth: ${res.authorization}, Locservice: ${res.locationServicesEnabled}`;
@@ -193,7 +255,7 @@ export class AppComponent implements OnInit {
                 appTime: new Date(),
                 longitude: res.longitude,
                 latitude: res.latitude,
-                msg: 'BackgroundGeolocationEvents.location'
+                msg: 'timer -> location'
               } as GeoLoc);*/
             }
           })
@@ -229,7 +291,7 @@ export class AppComponent implements OnInit {
                 appTime: new Date(),
                 longitude: res.longitude,
                 latitude: res.latitude,
-                msg: 'BackgroundGeolocationEvents.location'
+                msg: 'timer -> stationarylocation'
               } as GeoLoc);*/
             }
           })

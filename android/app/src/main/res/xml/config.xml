@@ -26,5 +26,9 @@
     <param name="onload" value="true"/>
   </feature>
 
+  <feature name="PowerManagement">
+    <param name="android-package" value="org.apache.cordova.powermanagement.PowerManagement"/>
+  </feature>
+
   
 </widget>
