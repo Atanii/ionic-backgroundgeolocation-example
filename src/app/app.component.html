@@ -14,6 +14,42 @@
           </ion-menu-toggle>
         </ion-list>
 
+        <ion-list>
+          <ion-list-header>Settings</ion-list-header>
+          <ion-item>
+            <ion-label>Háttérfuttatás {{setBg ? '(On)' : '(Off)'}}</ion-label>
+            <ion-toggle color="primary" [(ngModel)]="setBg" checked (ionChange)="onBgModeSettingUpdated($event)"></ion-toggle>
+          </ion-item>
+          <ion-item>
+            <ion-label>Háttérlokáció {{setBgGeoLoc ? '(On)' : '(Off)'}}</ion-label>
+            <ion-toggle color="primary" [(ngModel)]="setBgGeoLoc" checked (ionChange)="onBgGeoLocSettingsUpdated($event)"></ion-toggle>
+          </ion-item>
+          <ion-item>
+            <ion-label>POST {{setPOST ? '(On)' : '(Off)'}}</ion-label>
+            <ion-toggle color="primary" [(ngModel)]="setPOST" checked></ion-toggle>
+          </ion-item>
+          <ion-item>
+            <ion-label>Képernyő ébrentartás {{setWakelock ? '(On)' : '(Off)'}}</ion-label>
+            <ion-toggle color="primary" [(ngModel)]="setWakelock" checked (ionChange)="onWakelockSettingsUpdated($event)"></ion-toggle>
+          </ion-item>
+          <ion-item>
+            <ion-label>Lokáció Logolás {{setGeoLog ? '(On)' : '(Off)'}}</ion-label>
+            <ion-toggle color="primary" [(ngModel)]="setGeoLog" checked></ion-toggle>
+          </ion-item>
+          <ion-item>
+            <ion-label>Logolás {{setLog ? '(On)' : '(Off)'}}</ion-label>
+            <ion-toggle color="primary" [(ngModel)]="setLog" checked></ion-toggle>
+          </ion-item>
+          <ion-item>
+            <ion-label>Egyéb Logolás {{setMiscLog ? '(On)' : '(Off)'}}</ion-label>
+            <ion-toggle color="primary" [(ngModel)]="setMiscLog" checked></ion-toggle>
+          </ion-item>
+          <ion-item>
+            <ion-label>Hiba Logolás {{setErrorLog ? '(On)' : '(Off)'}}</ion-label>
+            <ion-toggle color="primary" [(ngModel)]="setErrorLog" checked></ion-toggle>
+          </ion-item>
+        </ion-list>
+
         <ion-list id="labels-list">
           <ion-list-header>Labels</ion-list-header>
 

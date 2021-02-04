@@ -15,6 +15,7 @@ import { GeneralInappService } from './services/general-inapp.service';
 import { BackgroundMode } from '@ionic-native/background-mode/ngx';
 import { PowerManagement } from '@ionic-native/power-management/ngx';
 import { HTTP } from '@ionic-native/http/ngx';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [AppComponent],
@@ -22,6 +23,7 @@ import { HTTP } from '@ionic-native/http/ngx';
   imports: [
     BrowserModule,
     IonicModule.forRoot(),
+    FormsModule,
     AppRoutingModule
   ],
   providers: [
