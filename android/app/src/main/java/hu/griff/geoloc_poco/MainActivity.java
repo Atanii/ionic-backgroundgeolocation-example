@@ -1,4 +1,4 @@
-package io.ionic.starter;
+package hu.griff.geoloc_poco;
 
 import android.os.Bundle;
 

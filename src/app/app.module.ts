@@ -16,6 +16,7 @@ import { BackgroundMode } from '@ionic-native/background-mode/ngx';
 import { PowerManagement } from '@ionic-native/power-management/ngx';
 import { HTTP } from '@ionic-native/http/ngx';
 import { FormsModule } from '@angular/forms';
+import { Geofence } from '@ionic-native/geofence/ngx';
 
 @NgModule({
   declarations: [AppComponent],
@@ -34,7 +35,8 @@ import { FormsModule } from '@angular/forms';
     GeneralInappService,
     BackgroundMode,
     HTTP,
-    PowerManagement
+    PowerManagement,
+    Geofence
   ],
   bootstrap: [AppComponent]
 })

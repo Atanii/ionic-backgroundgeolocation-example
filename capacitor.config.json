@@ -1,5 +1,5 @@
 {
-  "appId": "io.ionic.starter",
+  "appId": "hu.griff.geoloc_poco",
   "appName": "ionic-geolocation-poc",
   "bundledWebRuntime": false,
   "npmClient": "npm",
@@ -9,5 +9,6 @@
       "launchShowDuration": 0
     }
   },
-  "cordova": {}
+  "cordova": {},
+  "linuxAndroidStudioPath": "/snap/bin/android-studio"
 }
