@@ -6,18 +6,16 @@ import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 
 import {
-  BackgroundGeolocation, BackgroundGeolocationConfig, BackgroundGeolocationEvents, BackgroundGeolocationResponse
+  BackgroundGeolocation, BackgroundGeolocationAccuracy, BackgroundGeolocationConfig, BackgroundGeolocationEvents
 } from '@ionic-native/background-geolocation/ngx';
 import { GeneralInappService } from './services/general-inapp.service';
 import { GeoLoc } from './models/GeoLoc';
 import { SimpleMessage } from './models/SimpleMessage';
-import { timer } from 'rxjs';
 import { filter, map, tap } from 'rxjs/operators';
 
 import { BackgroundMode } from '@ionic-native/background-mode/ngx';
 import { PowerManagement } from '@ionic-native/power-management/ngx';
 import { Geofence } from '@ionic-native/geofence/ngx';
-import { JsonPipe } from '@angular/common';
 
 const { Geolocation } = Plugins;
 
@@ -60,11 +58,9 @@ export class AppComponent implements OnInit, OnDestroy {
     stationaryRadius: 20,
     distanceFilter: 30,
     
-    // INTERVAL
-    interval: 4900,
-    fastestInterval: 4900,
+    interval: 60000,
+    fastestInterval: 60000,
     
-    // FG - BG
     startForeground: true,
     stopOnStillActivity: false,
     // Enable this to clear background location settings when the app terminates
@@ -72,10 +68,10 @@ export class AppComponent implements OnInit, OnDestroy {
     
     // DEBUG
     // Enable this hear sounds for background-geolocation life-cycle
-    debug: true,
+    debug: false,
 
     // STORING, SYNCING
-    syncThreshold: 1,
+    syncThreshold: 10,
 
     // SERVER
     url: this.locService.URL,
@@ -200,8 +196,8 @@ export class AppComponent implements OnInit, OnDestroy {
       this.setErrorLog = false;
       this.setWakelock = false;
 
-      // this.initAndConfigureBgGeoLoc();
-      this.initAndConfigureGeofencing();
+      this.initAndConfigureBgGeoLoc();
+      // this.initAndConfigureGeofencing();
 
       this.onBgModeSettingUpdated();
       this.onWakelockSettingsUpdated();
@@ -314,53 +310,6 @@ export class AppComponent implements OnInit, OnDestroy {
             }
           );
 
-        // timer(1000, 15000).subscribe(_ => {
-        //   // CHECK STATUS
-        //   // this.backgroundGeolocation.checkStatus().then(res => {
-        //   //   const stats = `[INFO] Running: ${res.isRunning}, Auth: ${res.authorization}, Locservice: ${res.locationServicesEnabled}`;
-        //   //   console.log(stats);
-        //   //   this.locService.addNewMsg({
-        //   //     pluginTime: new Date(),
-        //   //     appTime: new Date(),
-        //   //     content: stats
-        //   //   } as SimpleMessage);
-        //   // });
-
-        //   // GET CURRENT LOC
-        //   this.backgroundGeolocation.getCurrentLocation().then(res => {
-        //     if (res && res.longitude !== undefined) {
-        //       const stats = `[INFO][TIMER] getCurrentLocation(),\n time: ${new Date(res.time)}, appTime: ${new Date()},\n long: ${res.longitude}, lat: ${res.latitude}`
-        //       console.log(stats);
-
-        //       if (this.setGeoLog) {
-        //         this.locService.addNewLoc({
-        //           pluginTime: new Date(res.time),
-        //           appTime: new Date(),
-        //           longitude: res.longitude,
-        //           latitude: res.latitude
-        //         } as GeoLoc);
-        //       }
-
-        //       if (this.setLog) {
-        //         this.locService.addNewMsg({
-        //           pluginTime: new Date(res.time),
-        //           appTime: new Date(),
-        //           content: stats
-        //         } as SimpleMessage);
-        //       }
-
-        //       ///////////////////////////////////////// POST
-        //       // this.locService.postNewLocation({
-        //       //   pluginTime: new Date(res.time),
-        //       //   appTime: new Date(),
-        //       //   longitude: res.longitude,
-        //       //   latitude: res.latitude,
-        //       //   msg: 'timer -> location'
-        //       // } as GeoLoc);
-        //     }
-        //   })
-
-        //   // GET STATIONARY
         //   this.backgroundGeolocation.getStationaryLocation().then(res => {
         //     if (res && res.longitude !== undefined) {
         //       const stats = `[INFO][TIMER] getStationaryLocation(),\n time: ${new Date(res.time)}, appTime: ${new Date()},\n long: ${res.longitude}, lat: ${res.latitude}`
