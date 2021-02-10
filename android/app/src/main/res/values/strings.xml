@@ -2,6 +2,9 @@
 <resources>
     <string name="app_name">ionic-geolocation-poc</string>
     <string name="title_activity_main">ionic-geolocation-poc</string>
-    <string name="package_name">io.ionic.starter</string>
-    <string name="custom_url_scheme">io.ionic.starter</string>
+    <string name="package_name">hu.griff.geoloc_poco</string>
+    <string name="custom_url_scheme">hu.griff.geoloc_poco</string>
+    <string name="mauron85_bgloc_account_name">$ACCOUNT_NAME</string>
+    <string name="mauron85_bgloc_account_type">$ACCOUNT_TYPE</string>
+    <string name="mauron85_bgloc_content_authority">$CONTENT_AUTHORITY</string>
 </resources>
