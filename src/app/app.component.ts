@@ -15,7 +15,6 @@ import { filter, map, tap } from 'rxjs/operators';
 
 import { BackgroundMode } from '@ionic-native/background-mode/ngx';
 import { PowerManagement } from '@ionic-native/power-management/ngx';
-import { Geofence } from '@ionic-native/geofence/ngx';
 
 const { Geolocation } = Plugins;
 
@@ -115,8 +114,7 @@ export class AppComponent implements OnInit, OnDestroy {
     private backgroundGeolocation: BackgroundGeolocation,
     private locService: GeneralInappService,
     private backgroundMode: BackgroundMode,
-    private powerManagement: PowerManagement,
-    private geofence: Geofence
+    private powerManagement: PowerManagement
   ) {
     this.initializeApp();
   }
@@ -499,64 +497,5 @@ export class AppComponent implements OnInit, OnDestroy {
     //   console.log('[INFO] Background mode:', this.backgroundMode.isEnabled(), this.backgroundMode.isActive());
     //   console.log('[INFO] Location:', JSON.stringify(loc));
     // });
-
-    Geolocation.getCurrentPosition(this.geolocationConfig).then(pos => {
-      this.geofence.initialize()
-        .then(() => console.log('[INFO] Geofence plugin ready'))
-        .then(() => {
-          this.geofence.remove(this.watchedGeofence.id);
-          this.geofence.addOrUpdate({
-            ...this.watchedGeofence,
-            latitude: pos.coords.latitude,
-            longitude: pos.coords.longitude
-          } as GeofenceObject)
-          .then(() => console.log('[INFO] Geofence added'))
-          .then(() => {
-            if (this.setLog) {
-              this.locService.addNewMsg({
-                pluginTime: new Date(),
-                appTime: new Date(),
-                content: '[INFO] Geofence added'
-              } as SimpleMessage);
-            }
-          })
-          .catch(reason => console.error('[ERROR] Geofence add error:', JSON.stringify(reason)));
-        })
-        .catch(err => {
-          console.error('[ERROR] Geofence plugin error:', JSON.stringify(err));
-          if (this.setErrorLog) {
-            this.locService.addNewMsg({
-              pluginTime: new Date(),
-              appTime: new Date(),
-              content: `[ERROR] Geofence plugin error: ${JSON.stringify(err)}`
-            } as SimpleMessage);
-          }
-        });
-
-      this.geofence.onTransitionReceived()
-        .pipe(
-          tap(res => console.log('[INFO] Geofencing transition received:', JSON.stringify(res))),
-          tap(res => {
-            if (this.setLog) {
-              this.locService.addNewMsg({
-                pluginTime: new Date(),
-                appTime: new Date(),
-                content: `[INFO] Geofencing transition received: ${JSON.stringify(res)}`
-              } as SimpleMessage);
-            }
-          })
-        )
-        .subscribe(
-          res => {
-            Geolocation.getCurrentPosition(this.geolocationConfig).then(newPos => {
-              this.geofence.addOrUpdate({
-                ...this.watchedGeofence,
-                latitude: newPos.coords.latitude,
-                longitude: newPos.coords.longitude
-              } as GeofenceObject);
-            });
-          }
-        );
-    }).catch(err => console.error('[ERROR] Initial geolocation:', JSON.stringify(err)));
   }
 }
