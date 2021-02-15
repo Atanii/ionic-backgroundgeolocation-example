@@ -14,7 +14,6 @@ import { SimpleMessage } from './models/SimpleMessage';
 import { filter, map, tap } from 'rxjs/operators';
 
 import { BackgroundMode } from '@ionic-native/background-mode/ngx';
-import { PowerManagement } from '@ionic-native/power-management/ngx';
 
 const { Geolocation } = Plugins;
 
@@ -82,7 +81,11 @@ export class AppComponent implements OnInit, OnDestroy {
       latitude: '@latitude',
       longitude: '@longitude',
       timeInMs: '@time'
-    }
+    },
+
+    // iOS
+    pauseLocationUpdates: false,
+    saveBatteryOnBackground: false
   };
 
   readonly geolocationConfig: GeolocationOptions = {
@@ -113,8 +116,7 @@ export class AppComponent implements OnInit, OnDestroy {
     private statusBar: StatusBar,
     private backgroundGeolocation: BackgroundGeolocation,
     private locService: GeneralInappService,
-    private backgroundMode: BackgroundMode,
-    private powerManagement: PowerManagement
+    private backgroundMode: BackgroundMode
   ) {
     this.initializeApp();
   }
@@ -130,7 +132,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   onWakelockSettingsUpdated() {
     // Aquire
-    if (this.setWakelock) {
+    /*if (this.setWakelock) {
       this.powerManagement.acquire()
         .then(res => {
           console.log('[INFO][POWER] Wakelock acquired: ', res);
@@ -167,7 +169,7 @@ export class AppComponent implements OnInit, OnDestroy {
       .catch(err => {
           console.log('[INFO][POWER] Failed to release wakelock: ', err);
       });
-    }
+    }*/
   }
 
   onBgGeoLocSettingsUpdated() {
@@ -229,6 +231,7 @@ export class AppComponent implements OnInit, OnDestroy {
                 appTime: new Date(),
                 content: 'Background mode'
               } as SimpleMessage);
+              //this.backgroundGeolocation.finish();
             }
           );
 
@@ -265,6 +268,8 @@ export class AppComponent implements OnInit, OnDestroy {
               //   msg: 'BackgroundGeolocationEvents.location'
               // } as GeoLoc);
               // this.backgroundGeolocation.finish();
+
+              //this.backgroundGeolocation.finish();
             }
           );
 
@@ -305,6 +310,7 @@ export class AppComponent implements OnInit, OnDestroy {
                   latitude: location.latitude
                 } as GeoLoc);
               }
+              //this.backgroundGeolocation.finish();
             }
           );
 
@@ -361,6 +367,8 @@ export class AppComponent implements OnInit, OnDestroy {
               // and the background-task may be completed.  You must do this regardless if your operations are successful or not.
               // IF YOU DON'T, ios will CRASH YOUR APP for spending too much time in the background.
               // this.backgroundGeolocation.finish(); // FOR IOS ONLY
+
+              //this.backgroundGeolocation.finish();
             }
           );
 
@@ -376,6 +384,8 @@ export class AppComponent implements OnInit, OnDestroy {
                 appTime: new Date(),
                 content: 'BackgroundGeolocation service has been started'
               } as SimpleMessage);
+
+              //this.backgroundGeolocation.finish();
             }
           );
 
@@ -391,6 +401,8 @@ export class AppComponent implements OnInit, OnDestroy {
                 appTime: new Date(),
                 content: 'BackgroundGeolocation service has been stopped'
               } as SimpleMessage);
+
+              //this.backgroundGeolocation.finish();
             }
           );
 
@@ -406,6 +418,8 @@ export class AppComponent implements OnInit, OnDestroy {
                 appTime: new Date(),
                 content: `BackgroundGeolocation authorization status: ${JSON.stringify(status)}`
               } as SimpleMessage);
+
+              //this.backgroundGeolocation.finish();
             }
           );
 
@@ -421,6 +435,8 @@ export class AppComponent implements OnInit, OnDestroy {
                 appTime: new Date(),
                 content: 'Foreground mode'
               } as SimpleMessage);
+
+              //this.backgroundGeolocation.finish();
             }
           );
 
@@ -436,6 +452,8 @@ export class AppComponent implements OnInit, OnDestroy {
                 appTime: new Date(),
                 content: 'Activity'
               } as SimpleMessage);
+
+              this.backgroundGeolocation.finish();
             }
           );
 
@@ -451,6 +469,7 @@ export class AppComponent implements OnInit, OnDestroy {
                 appTime: new Date(),
                 content: 'HTTP Authorization'
               } as SimpleMessage);
+              //this.backgroundGeolocation.finish();
             }
           );
 
@@ -466,6 +485,8 @@ export class AppComponent implements OnInit, OnDestroy {
                 appTime: new Date(),
                 content: 'Abort Requested'
               } as SimpleMessage);
+
+              //this.backgroundGeolocation.finish();
             }
           );
 

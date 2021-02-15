@@ -13,7 +13,6 @@ import { BackgroundGeolocation } from '@ionic-native/background-geolocation/ngx'
 import { GeneralInappService } from './services/general-inapp.service';
 
 import { BackgroundMode } from '@ionic-native/background-mode/ngx';
-import { PowerManagement } from '@ionic-native/power-management/ngx';
 import { HTTP } from '@ionic-native/http/ngx';
 import { FormsModule } from '@angular/forms';
 
@@ -33,8 +32,7 @@ import { FormsModule } from '@angular/forms';
     BackgroundGeolocation,
     GeneralInappService,
     BackgroundMode,
-    HTTP,
-    PowerManagement
+    HTTP
   ],
   bootstrap: [AppComponent]
 })

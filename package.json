@@ -37,7 +37,6 @@
     "cordova-plugin-compat": "^1.2.0",
     "cordova-plugin-device": "^2.0.3",
     "cordova-plugin-file": "^6.0.2",
-    "cordova-plugin-powermanagement-orig": "git+https://github.com/boltex/cordova-plugin-powermanagement.git",
     "es6-promise-plugin": "^4.2.2",
     "rxjs": "~6.5.5",
     "tslib": "^2.0.0",

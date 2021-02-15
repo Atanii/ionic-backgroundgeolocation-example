@@ -12,8 +12,8 @@
     <ion-list-header>Location updates, {{locations.length}} so far</ion-list-header>
     <ion-item *ngFor="let item of locations">
       <ion-label>
-        <p>Plugin time: {{item.pluginTime | date: 'M/d/yy, h:mm:ss a'}}</p>
-        <p>Inapp receive time: {{item.appTime | date: 'M/d/yy, h:mm:ss a'}}</p>
+        <!-- <p>Plugin time: {{item.pluginTime | date: 'M/d/yy, h:mm:ss a'}}</p>
+        <p>Inapp receive time: {{item.appTime | date: 'M/d/yy, h:mm:ss a'}}</p> -->
         <p>Lat: {{item.latitude}}, Long: {{item.longitude}}</p>
       </ion-label>
     </ion-item>
@@ -23,8 +23,8 @@
     <ion-list-header>Messages, {{messages.length}} so far</ion-list-header>
     <ion-item *ngFor="let msg of messages">
       <ion-label>
-        <p>Plugin time: {{msg.pluginTime | date: 'M/d/yy, h:mm:ss a'}}</p>
-        <p>Inapp receive time: {{msg.appTime | date: 'M/d/yy, h:mm:ss a'}}</p>
+        <!-- <p>Plugin time: {{msg.pluginTime | date: 'M/d/yy, h:mm:ss a'}}</p>
+        <p>Inapp receive time: {{msg.appTime | date: 'M/d/yy, h:mm:ss a'}}</p> -->
         <p>Msg: {{msg.content}}</p>
       </ion-label>
     </ion-item>
