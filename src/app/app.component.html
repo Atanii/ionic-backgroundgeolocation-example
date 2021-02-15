@@ -29,10 +29,6 @@
             <ion-toggle color="primary" [(ngModel)]="setPOST" checked></ion-toggle>
           </ion-item>
           <ion-item>
-            <ion-label>Képernyő ébrentartás {{setWakelock ? '(On)' : '(Off)'}}</ion-label>
-            <ion-toggle color="primary" [(ngModel)]="setWakelock" checked (ionChange)="onWakelockSettingsUpdated($event)"></ion-toggle>
-          </ion-item>
-          <ion-item>
             <ion-label>Lokáció Logolás {{setGeoLog ? '(On)' : '(Off)'}}</ion-label>
             <ion-toggle color="primary" [(ngModel)]="setGeoLog" checked></ion-toggle>
           </ion-item>
