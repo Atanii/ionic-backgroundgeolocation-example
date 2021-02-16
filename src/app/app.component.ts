@@ -40,12 +40,12 @@ export class AppComponent implements OnInit, OnDestroy {
   readonly config: BackgroundGeolocationConfig = {
     // PROVIDER
     // Ha nem az értékét írom be a ANDROID_DISTANCE_FILTER_PROVIDER-nek, akkor nem működik az app
-    locationProvider: 1,
+    locationProvider: 0,
     
     // ACCURACY
     desiredAccuracy: 10,
-    stationaryRadius: 20,
-    distanceFilter: 30,
+    stationaryRadius: 0,
+    distanceFilter: 0,
     
     interval: 60000,
     fastestInterval: 60000,
@@ -122,13 +122,13 @@ export class AppComponent implements OnInit, OnDestroy {
       this.statusBar.styleDefault();
       this.splashScreen.hide();
 
-      this.setBg = false;
-      this.setBgGeoLoc = false;
-      this.setPOST = false;
-      this.setLog = false;
-      this.setMiscLog = false;
-      this.setGeoLog = false;
-      this.setErrorLog = false;
+      this.setBg = true;
+      this.setBgGeoLoc = true;
+      this.setPOST = true;
+      this.setLog = true;
+      this.setMiscLog = true;
+      this.setGeoLog = true;
+      this.setErrorLog = true;
 
       this.initAndConfigureBgGeoLoc();
       this.onBgModeSettingUpdated();
@@ -150,90 +150,107 @@ export class AppComponent implements OnInit, OnDestroy {
   private initAndConfigureBgGeoLoc(): any {
     this.backgroundGeolocation.configure(this.config)
       .then(() => {
-        this.backgroundGeolocation.on(BackgroundGeolocationEvents.background)
-          .pipe(
-            tap(() => console.log("[INFO] Background mode")),
-            filter(() => this.setLog)
-          )
-          .subscribe(
-            () => {
-              this.locService.addNewMsg({
-                pluginTime: new Date(),
-                appTime: new Date(),
-                content: 'Background mode'
-              } as SimpleMessage);
-            }
-          );
+        // this.backgroundGeolocation.on(BackgroundGeolocationEvents.background)
+        //   .pipe(
+        //     tap(() => console.log("[INFO] Background mode")),
+        //     filter(() => this.setLog)
+        //   )
+        //   .subscribe(
+        //     () => {
+        //       this.locService.addNewMsg({
+        //         pluginTime: new Date(),
+        //         appTime: new Date(),
+        //         content: 'Background mode'
+        //       } as SimpleMessage);
+        //     }
+        //   );
 
         this.backgroundGeolocation.on(BackgroundGeolocationEvents.location)
-          .pipe(
-            tap(loc => console.log('[INFO][BackgroundGeolocationEvents.location] Location updated, new location:', JSON.stringify(loc)))
-          )
+          // .pipe(
+          //   tap(loc => console.log('[INFO][BackgroundGeolocationEvents.location] Location updated, new location:', JSON.stringify(loc)))
+          // )
           .subscribe(
             location => {
-              if (this.setGeoLog) {
-                this.locService.addNewLoc({
-                  pluginTime: new Date(location.time),
-                  appTime: new Date(),
-                  longitude: location.longitude,
-                  latitude: location.latitude
-                } as GeoLoc);
-              }
+              this.backgroundGeolocation.startTask().then(
+                key => {
+                  if (this.setGeoLog) {
+                    this.locService.addNewLoc({
+                      pluginTime: new Date(location.time),
+                      appTime: new Date(),
+                      longitude: location.longitude,
+                      latitude: location.latitude
+                    } as GeoLoc);
+                  }
+    
+                  if (this.setLog) {
+                    this.locService.addNewMsg({
+                      pluginTime: new Date(location.time),
+                      appTime: new Date(),
+                      content: '[INFO][BackgroundGeolocationEvents.location] Location updated'
+                    } as SimpleMessage);
+                  }
+    
+                  ///////////////////////////////////////// POST
+                  // this.locService.postNewLocation({
+                  //   pluginTime: new Date(location.time),
+                  //   appTime: new Date(),
+                  //   longitude: location.longitude,
+                  //   latitude: location.latitude,
+                  //   msg: 'BackgroundGeolocationEvents.location'
+                  // } as GeoLoc);
+    
+                  //this.backgroundGeolocation.finish();
 
-              if (this.setLog) {
-                this.locService.addNewMsg({
-                  pluginTime: new Date(location.time),
-                  appTime: new Date(),
-                  content: '[INFO][BackgroundGeolocationEvents.location] Location updated'
-                } as SimpleMessage);
-              }
-
-              ///////////////////////////////////////// POST
-              // this.locService.postNewLocation({
-              //   pluginTime: new Date(location.time),
-              //   appTime: new Date(),
-              //   longitude: location.longitude,
-              //   latitude: location.latitude,
-              //   msg: 'BackgroundGeolocationEvents.location'
-              // } as GeoLoc);
-
-              //this.backgroundGeolocation.finish();
+                  this.backgroundGeolocation.endTask(key);
+                }
+              )              
             }
           );
 
         this.backgroundGeolocation.on(BackgroundGeolocationEvents.stationary)
-          .pipe(
-            tap(loc => console.log('Stationary location updated, new location:', JSON.stringify(loc)))
-          )
+          // .pipe(
+          //   tap(loc => console.log('Stationary location updated, new location:', JSON.stringify(loc)))
+          // )
           .subscribe(
             location => {
-              if (this.setGeoLog) {
-                this.locService.addNewLoc({
-                  pluginTime: new Date(location.time),
-                  appTime: new Date(),
-                  longitude: location.longitude,
-                  latitude: location.latitude
-                } as GeoLoc);
-              }
+              this.backgroundGeolocation.startTask().then(
+                key => {
+                  if (this.setGeoLog) {
+                    this.locService.addNewLoc({
+                      pluginTime: new Date(location.time),
+                      appTime: new Date(),
+                      longitude: location.longitude,
+                      latitude: location.latitude
+                    } as GeoLoc);
+                  }
+                  this.backgroundGeolocation.endTask(key);
+                }
+              )              
             }
           );
 
         this.backgroundGeolocation.on(BackgroundGeolocationEvents.error)
-          .pipe(
-            map(error => `Error: ${JSON.stringify(error)}`),
-            tap(error => console.error('[ERROR]', error)),
-            filter(_ => this.setErrorLog)
-          )
+          // .pipe(
+          //   map(error => `Error: ${JSON.stringify(error)}`),
+          //   tap(error => console.error('[ERROR]', error)),
+          //   filter(_ => this.setErrorLog)
+          // )
           .subscribe(
             error => {
-              this.locService.addNewMsg({
-                pluginTime: new Date(),
-                appTime: new Date(),
-                content: error
-              } as SimpleMessage);
+              this.backgroundGeolocation.startTask().then(
+                key => {
+                  this.locService.addNewMsg({
+                    pluginTime: new Date(),
+                    appTime: new Date(),
+                    content: JSON.stringify(error)
+                  } as SimpleMessage);
+                  this.backgroundGeolocation.endTask(key);
+                }
+              )              
             }
           );
 
+        /*
         this.backgroundGeolocation.on(BackgroundGeolocationEvents.start)
           .pipe(
             tap(() => console.log('[INFO] BackgroundGeolocation service has been started')),
@@ -338,8 +355,10 @@ export class AppComponent implements OnInit, OnDestroy {
               } as SimpleMessage);
             }
           );
+        */
 
     });
+
   }
 
 }
