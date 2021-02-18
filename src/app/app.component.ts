@@ -34,6 +34,9 @@ export class AppComponent implements OnInit, OnDestroy {
   public labels = [
     'Geolocation', 'POC', 'Logs', 'Background'
   ];
+
+  private previousLocMs = -1;
+  private previousStatLocMs = -1;
   
   // BackgroundGeolocationProvider.ANDROID_DISTANCE_FILTER_PROVIDER = 0,
   // BackgroundGeolocationProvider.ANDROID_ACTIVITY_PROVIDER = 1
@@ -63,7 +66,7 @@ export class AppComponent implements OnInit, OnDestroy {
     syncThreshold: 10,
 
     // SERVER
-    url: this.locService.URL,
+    url: "", // this.locService.URL,
     httpHeaders: {
       'Access-Control-Allow-Origin': '*'
     },
@@ -173,34 +176,34 @@ export class AppComponent implements OnInit, OnDestroy {
             location => {
               this.backgroundGeolocation.startTask().then(
                 key => {
-                  if (this.setGeoLog) {
-                    this.locService.addNewLoc({
-                      pluginTime: new Date(location.time),
-                      appTime: new Date(),
-                      longitude: location.longitude,
-                      latitude: location.latitude
-                    } as GeoLoc);
-                  }
-    
-                  if (this.setLog) {
-                    this.locService.addNewMsg({
-                      pluginTime: new Date(location.time),
-                      appTime: new Date(),
-                      content: '[INFO][BackgroundGeolocationEvents.location] Location updated'
-                    } as SimpleMessage);
-                  }
-    
-                  ///////////////////////////////////////// POST
-                  // this.locService.postNewLocation({
-                  //   pluginTime: new Date(location.time),
-                  //   appTime: new Date(),
-                  //   longitude: location.longitude,
-                  //   latitude: location.latitude,
-                  //   msg: 'BackgroundGeolocationEvents.location'
-                  // } as GeoLoc);
-    
-                  //this.backgroundGeolocation.finish();
+                  var tmp = {
+                    pluginTime: new Date(location.time),
+                    appTime: new Date(),
+                    longitude: location.longitude,
+                    latitude: location.latitude
+                  } as GeoLoc;
 
+                  if (this.previousLocMs != -1) {
+                    const elapsedInMs = Math.abs(this.previousLocMs - Date.now());
+                    console.log(`[INFO] Elapsed time since last location updated: ${elapsedInMs}`);
+                    if (elapsedInMs >= 60000) {
+                      this.locService.addNewLoc(tmp);
+                      this.locService.postNewLocation(tmp);
+                      this.previousLocMs = Date.now();
+                    }
+                  } else {
+                    this.locService.addNewLoc(tmp);
+                    this.locService.postNewLocation(tmp);
+                    this.previousLocMs = Date.now();
+
+                    if (this.setLog) {
+                      this.locService.addNewMsg({
+                        pluginTime: new Date(location.time),
+                        appTime: new Date(),
+                        content: 'Location updated'
+                      } as SimpleMessage);
+                    }
+                  }
                   this.backgroundGeolocation.endTask(key);
                 }
               )              
@@ -215,13 +218,33 @@ export class AppComponent implements OnInit, OnDestroy {
             location => {
               this.backgroundGeolocation.startTask().then(
                 key => {
-                  if (this.setGeoLog) {
-                    this.locService.addNewLoc({
-                      pluginTime: new Date(location.time),
-                      appTime: new Date(),
-                      longitude: location.longitude,
-                      latitude: location.latitude
-                    } as GeoLoc);
+                  var tmp = {
+                    pluginTime: new Date(location.time),
+                    appTime: new Date(),
+                    longitude: location.longitude,
+                    latitude: location.latitude
+                  } as GeoLoc;
+
+                  if (this.previousStatLocMs != -1) {
+                    const elapsedInMs = Math.abs(this.previousStatLocMs - Date.now());
+                    console.log(`[INFO] Elapsed time since last stationary location updated: ${elapsedInMs}`);
+                    if (elapsedInMs >= 60000) {
+                      this.locService.addNewLoc(tmp);
+                      this.locService.postNewLocation(tmp);
+                      this.previousStatLocMs = Date.now();
+                    }
+                  } else {
+                    this.locService.addNewLoc(tmp);
+                    this.locService.postNewLocation(tmp);
+                    this.previousStatLocMs = Date.now();
+
+                    if (this.setLog) {
+                      this.locService.addNewMsg({
+                        pluginTime: new Date(location.time),
+                        appTime: new Date(),
+                        content: 'Stationary location updated'
+                      } as SimpleMessage);
+                    }
                   }
                   this.backgroundGeolocation.endTask(key);
                 }
